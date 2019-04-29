@@ -1,7 +1,6 @@
 class Character
   attr_reader :name
-  attr_accessor :hit_point
-  attr_accessor :attack_point
+  attr_accessor :hit_point, :attack_point
 
   def initialize(name, hit_point, attack_point)
     @name = name
@@ -18,63 +17,63 @@ end
 
 # 主人公側の処理
 class Hero < Character
-  def hero_attack 
+  def hero_attack(receiver) 
+    case rand(10)
+    when 0
+      puts "#{name}の攻撃！クリティカルヒット！！#{receiver.name}に#{attack_point * 2}のダメージ！"
+      receiver.hit_point = receiver.hit_point - (attack_point * 2 )
+    when 9
+      puts "#{name}の攻撃！......ミス！#{receiver.name}にダメージを与えられなかった！"
+    else
+      puts "#{name}の攻撃！#{receiver.name}に#{attack_point}のダメージ！"
+      receiver.hit_point = receiver.hit_point - attack_point
+    end
   end
 end
 
 
 # 敵側の処理
 class Enemy < Character
-  def enemy_attack
+  def enemy_attack(receiver)
+    if rand(10) == 9
+      puts "#{name}の攻撃！......ミス！#{receiver.name}はダメージを受けなかった！"
+    else
+      puts "#{name}の攻撃！#{receiver.name}に#{attack_point}のダメージ！"
+      receiver.hit_point = receiver.hit_point - attack_point
+    end
   end
 end
+
 # キャラクターを設定
 hero = Hero.new("勇者", 30, 8)
 enemy = Enemy.new("魔王", 40, 4)
 
 puts "戦闘開始！"
-puts "\n"
-
 
 # 繰り返し戦闘処理
 while hero.hit_point > 0 && enemy.hit_point > 0 
 
   # ステータス表示
-  puts "----------------------------"
+  puts "\n----------------------------"
+  puts "\n"
   hero.output_status
   enemy.output_status
   puts "\n"
 
   # 自分のターン
-  case rand(10)
-  when 0
-    puts "#{hero.name}の攻撃！クリティカルヒット！！#{enemy.name}に#{hero.attack_point * 2}のダメージ！"
-    enemy.hit_point = enemy.hit_point - (hero.attack_point * 2 )
-  when 9
-    puts "#{hero.name}の攻撃！......ミス！#{enemy.name}にダメージを与えられなかった！"
-  else
-    puts "#{hero.name}の攻撃！#{enemy.name}に#{hero.attack_point}のダメージ！"
-    enemy.hit_point = enemy.hit_point - hero.attack_point
-  end
-
+  hero.hero_attack(enemy)
   # 敵のターン
   if enemy.hit_point <= 0
     break
-  elsif rand(10) == 9
-    puts "#{enemy.name}の攻撃！......ミス！#{hero.name}はダメージを受けなかった！"
   else
-    puts "#{enemy.name}の攻撃！#{hero.name}に#{enemy.attack_point}のダメージ！"
-    hero.hit_point = hero.hit_point - enemy.attack_point
+    enemy.enemy_attack(hero)
   end
-
 end
 
 
 # 戦闘結果判定
 if hero.hit_point > enemy.hit_point
-  puts "\n"
-  puts "#{enemy.name}を倒した！"
+  puts "\n#{enemy.name}を倒した！"
 else
-  puts "\n"
-  puts "#{hero.name}は負けてしまった..."
+  puts "\n#{hero.name}は負けてしまった..."
 end
